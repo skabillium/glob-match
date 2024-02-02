@@ -1,0 +1,35 @@
+{
+  "name": "glob-match",
+  "version": "1.0.0",
+  "description": "Glob matching library",
+  "main": "index.js",
+  "keywords": [
+    "glob",
+    "pattern",
+    "match",
+    "matcher"
+  ],
+  "author": "skabillium@gmail.com",
+  "license": "MIT",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "lib"
+  ],
+  "scripts": {
+    "start": "tsx src/test.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.15",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
