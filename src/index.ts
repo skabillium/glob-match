@@ -29,61 +29,51 @@ function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
                 s++;
                 break;
             case '[':
-                let matched = false;
                 let negate = false;
                 p++;
-                if (p === pattern.length) {
-                    throw new Error('Invalid glog string, Unclosed "["');
-                }
 
                 if (pattern[p] === '!') {
                     negate = true;
                     p++;
                     if (p === pattern.length) {
-                        throw new Error('Invalid glog string, Unclosed "["');
+                        throw new Error('Unclosed bracket');
                     }
                 }
 
-                let previous = pattern[p];
-                matched = previous === str[s];
-                p++;
-
-                while (pattern[p] !== ']' && p !== pattern.length) {
-                    switch (pattern[p]) {
-                        case '-':
-                            {
-                                p++;
-                                switch (pattern[p]) {
-                                    case ']':
-                                        matched = str[s] === '-';
-                                        break;
-                                    default: {
-                                        if (p === pattern.length) {
-                                            throw new Error('syntax');
-                                        }
-                                        matched =
-                                            previous <= str[s] &&
-                                            str[s] <= pattern[p];
-                                        previous = pattern[p];
-                                        p++;
-                                    }
-                                }
-                            }
-
-                            break;
-                        default: {
-                            console.log('Here');
-                            previous = pattern[p];
-                            matched = previous === str[s];
-                            p++;
+                let chars = '';
+                while (pattern[p] !== ']' && p < pattern.length) {
+                    if (pattern[p] === '-') {
+                        const encoder = new TextEncoder();
+                        const start = encoder.encode(pattern[p - 1])[0];
+                        p++;
+                        const end = encoder.encode(pattern[p])[0];
+                        if (end <= start) {
+                            // TODO: Show the chars not the codes
+                            throw new Error(
+                                `Invalid range from ${start} to ${end}`,
+                            );
                         }
+
+                        for (let i = start + 1; i <= end; i++) {
+                            chars += String.fromCharCode(i);
+                        }
+                        p++;
+                        break;
                     }
+
+                    if (pattern[p] === ']') {
+                        break;
+                    }
+
+                    chars += pattern[p];
+                    p++;
                 }
 
                 if (pattern[p] !== ']') {
-                    throw new Error('Invalid glob  string, Unclosed "["');
+                    throw new Error('Unclosed bracket');
                 }
 
+                let matched = chars.includes(str[s]);
                 if (negate) {
                     matched = !matched;
                 }
