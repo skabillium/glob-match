@@ -2,12 +2,20 @@ export function toRegex(pattern: string) {
     return new RegExp(pattern);
 }
 
-type CheckOptions = {
+type MatchOptions = {
     patternStart: number;
     strStart: number;
 };
 
-function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
+function UnclosedBracketException() {
+    return new Error('Unclosed bracket');
+}
+
+function UnfinishedEscapeException() {
+    return new Error('Unfinished escape');
+}
+
+function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
     let p = opts?.patternStart ?? 0;
     let s = opts?.strStart ?? 0;
 
@@ -36,7 +44,7 @@ function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
                     negate = true;
                     p++;
                     if (p === pattern.length) {
-                        throw new Error('Unclosed bracket');
+                        throw UnclosedBracketException();
                     }
                 }
 
@@ -58,7 +66,6 @@ function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
                             chars += String.fromCharCode(i);
                         }
                         p++;
-                        break;
                     }
 
                     if (pattern[p] === ']') {
@@ -70,14 +77,11 @@ function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
                 }
 
                 if (pattern[p] !== ']') {
-                    throw new Error('Unclosed bracket');
+                    throw UnclosedBracketException();
                 }
 
-                let matched = chars.includes(str[s]);
-                if (negate) {
-                    matched = !matched;
-                }
-
+                // Result is a logical xor between the char includes and the negation
+                const matched = chars.includes(str[s]) !== negate;
                 if (!matched) {
                     return false;
                 }
@@ -88,7 +92,7 @@ function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
             case '\\':
                 p++;
                 if (p === pattern.length) {
-                    throw new Error('Invalid glob string, unfinished escape');
+                    throw UnfinishedEscapeException();
                 }
             default:
                 if (pattern[p] === str[s]) {
@@ -113,12 +117,33 @@ function glob(pattern: string, str: string, opts?: CheckOptions): boolean {
     return false;
 }
 
+type OnError = 'false' | 'throw';
+type CheckOptions = { onError: OnError };
+
 /**
  * Checks if a string matches a glob pattern
  * @param pattern Glob pattern to check against
  * @param str String
  * @returns {boolean}
  */
-export function check(pattern: string, str: string): boolean {
-    return glob(pattern, str);
+export function check(
+    pattern: string,
+    str: string,
+    checkOptions?: CheckOptions,
+): boolean {
+    let onError: OnError;
+    if (!checkOptions) {
+        onError = 'throw';
+    } else {
+        onError = checkOptions.onError;
+    }
+    try {
+        return glob(pattern, str);
+    } catch (err) {
+        if (onError === 'throw') {
+            throw err;
+        }
+
+        return false;
+    }
 }

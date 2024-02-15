@@ -113,11 +113,46 @@ describe('Full test suite', () => {
         test('main.[a-c] with main.d', () => {
             expect(check('main.[a-c]', 'main.d')).toBe(false);
         });
+        test('Letter[A-Za-z0-9] with Letter', () => {
+            expect(check('Letter[A-Za-z0-9]', 'Letter')).toBe(false);
+        });
+        test('Letter[A-Za-z0-9] with Letter1', () => {
+            expect(check('Letter[A-Za-z0-9]', 'Letter1')).toBe(true);
+        });
     });
 
     // it('Should work with negation', () => {});
 
     // it('Should work with escaped strings', () => {});
 
-    // it('Should work with edge cases', () => {});
+    it('Should work with edge cases', () => {
+        test('Letter[A-Z1] with LetterA', () => {
+            expect(check('Letter[A-Z1]', 'LetterA')).toBe(true);
+        });
+        test('Letter[A-Z1] with LetterB', () => {
+            expect(check('Letter[A-Z1]', 'LetterB')).toBe(true);
+        });
+        test('Letter[A-Z1] with LetterZ', () => {
+            expect(check('Letter[A-Z1]', 'LetterZ')).toBe(true);
+        });
+        test('Letter[A-Z1] with Letter1', () => {
+            expect(check('Letter[A-Z1]', 'Letter1')).toBe(true);
+        });
+        test('Letter[A-Z1] with Letter2', () => {
+            expect(check('Letter[A-Z1]', 'Letter2')).toBe(false);
+        });
+        test('Letter[A-Z1] with Lettera', () => {
+            expect(check('Letter[A-Z1]', 'Lettera')).toBe(false);
+        });
+    });
+
+    it('Should parse options correctly', () => {
+        const invalid = 'main.[abc';
+        const str = 'main.b';
+        test(`Invalid ${invalid}`, () => {
+            expect(() => check(invalid, str)).toThrow();
+            expect(() => check(invalid, str, { onError: 'throw' })).toThrow();
+            expect(check(invalid, str, { onError: 'false' })).toBe(false);
+        });
+    });
 });
