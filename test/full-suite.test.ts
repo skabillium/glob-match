@@ -121,9 +121,38 @@ describe('Full test suite', () => {
         });
     });
 
-    // it('Should work with negation', () => {});
+    it('Should work with negation', () => {
+        test('[!CB]at with Cat', () => {
+            expect(check('[!CB]at', 'Cat')).toBe(false);
+        });
+        test('[!CB]at with Bat', () => {
+            expect(check('[!CB]at', 'Bat')).toBe(false);
+        });
+        test('[!CB]at with cat', () => {
+            expect(check('[!CB]at', 'cat')).toBe(true);
+        });
+        test('main.[!a-c] with main.d', () => {
+            expect(check('main.[!a-c]', 'main.d')).toBe(true);
+        });
+        test('main.[!a-c] with main.c', () => {
+            expect(check('main.[!a-c]', 'main.c')).toBe(false);
+        });
+        test('Letter[!1] with Letter1', () => {
+            expect(check('Letter[!1]', 'Letter1')).toBe(false);
+        });
+        test('Letter[!1] with Letter2', () => {
+            expect(check('Letter[!1]', 'Letter2')).toBe(true);
+        });
+        test('Letter[A-Za-z0-9] with Letter1', () => {
+            expect(check('Letter[A-Za-z0-9]', 'Letter1')).toBe(true);
+        });
+    });
 
-    // it('Should work with escaped strings', () => {});
+    it('Should work with escaped strings', () => {
+        test('\\* with *', () => {
+            expect(check('\\*', '*')).toBe(true);
+        });
+    });
 
     it('Should work with edge cases', () => {
         test('Letter[A-Z1] with LetterA', () => {
@@ -143,6 +172,21 @@ describe('Full test suite', () => {
         });
         test('Letter[A-Z1] with Lettera', () => {
             expect(check('Letter[A-Z1]', 'Lettera')).toBe(false);
+        });
+    });
+
+    it('Should throw syntax errors', () => {
+        test('[', () => {
+            expect(() => check('[', 'a')).toThrow();
+        });
+        test('[!', () => {
+            expect(() => check('[!', 'a')).toThrow();
+        });
+        test('[--', () => {
+            expect(() => check('[--', 'a')).toThrow();
+        });
+        test('\\', () => {
+            expect(() => check('\\', 'a')).toThrow();
         });
     });
 

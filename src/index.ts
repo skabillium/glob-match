@@ -137,6 +137,7 @@ export function check(
     } else {
         onError = checkOptions.onError;
     }
+
     try {
         return glob(pattern, str);
     } catch (err) {
