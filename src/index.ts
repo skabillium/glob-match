@@ -124,20 +124,14 @@ type CheckOptions = { onError: OnError };
  * Checks if a string matches a glob pattern
  * @param pattern Glob pattern to check against
  * @param str String
- * @returns {boolean}
  */
 export function check(
     pattern: string,
     str: string,
     checkOptions?: CheckOptions,
 ): boolean {
-    let onError: OnError;
-    if (!checkOptions) {
-        onError = 'throw';
-    } else {
-        onError = checkOptions.onError;
-    }
-
+    // Provide the option of not throwing an error when validating
+    const onError = checkOptions?.onError ?? 'throw';
     try {
         return glob(pattern, str);
     } catch (err) {

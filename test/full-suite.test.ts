@@ -3,6 +3,7 @@ import { check } from '../src/index';
 import test from 'node:test';
 
 describe('Full test suite', () => {
+    // Single char
     it('Should work with "?"', () => {
         test('Should match', () => {
             expect(check('?at', 'Cat')).toBe(true);
@@ -13,6 +14,7 @@ describe('Full test suite', () => {
         });
     });
 
+    // Wildcard
     it('Should work with *', () => {
         test('Law* with Law', () => {
             expect(check('Law*', 'Law')).toBe(true);
@@ -51,6 +53,7 @@ describe('Full test suite', () => {
         });
     });
 
+    // Brackets
     it('Should work with multiple values', () => {
         test('*.[abc] with main.a', () => {
             expect(check('*.[abc]', 'main.a')).toBe(true);
@@ -88,6 +91,7 @@ describe('Full test suite', () => {
         });
     });
 
+    // Brackets with ranges
     it('Should work with ranges', () => {
         test('[A-Z]m with Am', () => {
             expect(check('[A-Z]m', 'Am')).toBe(true);
@@ -121,6 +125,7 @@ describe('Full test suite', () => {
         });
     });
 
+    // Negation
     it('Should work with negation', () => {
         test('[!CB]at with Cat', () => {
             expect(check('[!CB]at', 'Cat')).toBe(false);
@@ -148,12 +153,14 @@ describe('Full test suite', () => {
         });
     });
 
+    // Escaped characters
     it('Should work with escaped strings', () => {
         test('\\* with *', () => {
             expect(check('\\*', '*')).toBe(true);
         });
     });
 
+    // Weird edge cases
     it('Should work with edge cases', () => {
         test('Letter[A-Z1] with LetterA', () => {
             expect(check('Letter[A-Z1]', 'LetterA')).toBe(true);
@@ -173,8 +180,34 @@ describe('Full test suite', () => {
         test('Letter[A-Z1] with Lettera', () => {
             expect(check('Letter[A-Z1]', 'Lettera')).toBe(false);
         });
+
+        test('[!]a-] with b', () => {
+            expect(check('[!]a-]', 'b')).toBe(true);
+        });
+        test('[!]a-] with ]', () => {
+            expect(check('[!]a-]', ']')).toBe(false);
+        });
+        test('[!]a-] with a', () => {
+            expect(check('[!]a-]', 'a')).toBe(false);
+        });
+        test('[!]a-] with -', () => {
+            expect(check('[!]a-]', '-')).toBe(false);
+        });
     });
 
+    // Unicode
+    it('Should work with unicode', () => {
+        test('[Γγ]ειά σου, [Ττ]ι κάνεις with Γειά σου, τι κάνεις', () => {
+            expect(
+                check('[Γγ]ειά σου, [Ττ]ι κάνεις', 'Γειά σου, τι κάνεις'),
+            ).toBe(true);
+        });
+        test('[Пп]ривет, [Мм]ир with Привет, Мир', () => {
+            expect(check('[Пп]ривет, [Мм]ир', 'Привет, Мир')).toBe(true);
+        });
+    });
+
+    // Syntax errors
     it('Should throw syntax errors', () => {
         test('[', () => {
             expect(() => check('[', 'a')).toThrow();
@@ -190,6 +223,7 @@ describe('Full test suite', () => {
         });
     });
 
+    // Option parsing
     it('Should parse options correctly', () => {
         const invalid = 'main.[abc';
         const str = 'main.b';
