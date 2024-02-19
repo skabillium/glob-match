@@ -1,6 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
 import { check } from '../src/index';
-import test from 'node:test';
 
 describe('Full test suite', () => {
     // Single char

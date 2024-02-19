@@ -38,6 +38,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                 break;
             case '[':
                 let negate = false;
+                let chars = '';
                 p++;
 
                 if (pattern[p] === '!') {
@@ -46,19 +47,27 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                     if (p === pattern.length) {
                         throw UnclosedBracketException();
                     }
+                    chars += pattern[p];
+                    p++;
                 }
 
-                let chars = '';
                 while (pattern[p] !== ']' && p < pattern.length) {
                     if (pattern[p] === '-') {
+                        if (pattern[p + 1] === ']') {
+                            chars += pattern[p];
+                            p++;
+                            break;
+                        }
+
                         const encoder = new TextEncoder();
                         const start = encoder.encode(pattern[p - 1])[0];
                         p++;
                         const end = encoder.encode(pattern[p])[0];
                         if (end <= start) {
-                            // TODO: Show the chars not the codes
                             throw new Error(
-                                `Invalid range from ${start} to ${end}`,
+                                `Invalid range from '${String.fromCharCode(
+                                    start,
+                                )}' to '${String.fromCharCode(end)}'`,
                             );
                         }
 
