@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { check } from '../src/index';
+import { check, Checker } from '../src/index';
 
 describe('Full test suite', () => {
     // Single char
@@ -76,10 +76,30 @@ describe('Full test suite', () => {
         expect(check('Letter[A-Z1]', 'Letter1')).toBe(true);
         expect(check('Letter[A-Z1]', 'Letter2')).toBe(false);
         expect(check('Letter[A-Z1]', 'Lettera')).toBe(false);
+
         expect(check('[!]a-]', 'b')).toBe(true);
         expect(check('[!]a-]', ']')).toBe(false);
         expect(check('[!]a-]', 'a')).toBe(false);
         expect(check('[!]a-]', '-')).toBe(false);
+
+        expect(check('[--0]', '-')).toBe(true);
+        expect(check('[--0]', '.')).toBe(true);
+        expect(check('[--0]', '/')).toBe(true);
+        expect(check('[--0]', '0')).toBe(true);
+        expect(check('[--0]', 'b')).toBe(false);
+
+        // TODO: Fix these cases
+        // expect(check('[][!]', ']')).toBe(true);
+        // expect(check('[][!]', '[')).toBe(true);
+        // expect(check('[][!]', '!')).toBe(true);
+        // expect(check('[][!]', 'a')).toBe(false);
+        // expect(() => check('[][!', ']')).toThrow();
+
+        expect(check('[[?*\\]', '[')).toBe(true);
+        expect(check('[[?*\\]', '?')).toBe(true);
+        expect(check('[[?*\\]', '*')).toBe(true);
+        expect(check('[[?*\\]', '\\')).toBe(true);
+        expect(check('[[?*\\]', 'a')).toBe(false);
     });
 
     // Unicode
@@ -99,6 +119,14 @@ describe('Full test suite', () => {
         expect(() => check('[!', 'a')).toThrow();
         expect(() => check('[--', 'a')).toThrow();
         expect(() => check('\\', 'a')).toThrow();
+    });
+
+    // Build checker function
+    it('Should create a checker function', () => {
+        const isMatch = Checker('*cat*');
+
+        expect(isMatch('concatenate')).toBe(true);
+        expect(isMatch('hello')).toBe(false);
     });
 
     // Option parsing

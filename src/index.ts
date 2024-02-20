@@ -1,7 +1,3 @@
-export function toRegex(pattern: string) {
-    return new RegExp(pattern);
-}
-
 type MatchOptions = {
     patternStart: number;
     strStart: number;
@@ -53,10 +49,18 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
 
                 while (pattern[p] !== ']' && p < pattern.length) {
                     if (pattern[p] === '-') {
-                        if (pattern[p + 1] === ']') {
+                        const before = pattern[p - 1];
+                        const after = pattern[p + 1];
+                        if (after === ']') {
                             chars += pattern[p];
                             p++;
                             break;
+                        }
+
+                        if (before === '[') {
+                            chars += pattern[p];
+                            p++;
+                            continue;
                         }
 
                         const encoder = new TextEncoder();
@@ -78,6 +82,9 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                     }
 
                     if (pattern[p] === ']') {
+                        if (pattern[p - 1] === '[') {
+                            continue;
+                        }
                         break;
                     }
 
@@ -150,4 +157,8 @@ export function check(
 
         return false;
     }
+}
+
+export function Checker(pattern: string) {
+    return (str: string) => glob(pattern, str);
 }
