@@ -34,6 +34,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                 break;
             case '[':
                 let negate = false;
+                let matched = false;
                 let chars = '';
                 p++;
 
@@ -43,6 +44,12 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                     if (p === pattern.length) {
                         throw UnclosedBracketException();
                     }
+                    chars += pattern[p];
+                    p++;
+                }
+
+                matched = (pattern[p] === str[s]) !== negate;
+                if (pattern[p] === ']' && p !== pattern.length - 1) {
                     chars += pattern[p];
                     p++;
                 }
@@ -83,6 +90,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
 
                     if (pattern[p] === ']') {
                         if (pattern[p - 1] === '[') {
+                            chars += ']';
                             continue;
                         }
                         break;
@@ -97,7 +105,10 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                 }
 
                 // Result is a logical xor between the char includes and the negation
-                const matched = chars.includes(str[s]) !== negate;
+                if (chars !== '') {
+                    matched = chars.includes(str[s]) !== negate;
+                }
+
                 if (!matched) {
                     return false;
                 }

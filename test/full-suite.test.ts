@@ -60,7 +60,6 @@ describe('Full test suite', () => {
         expect(check('main.[!a-c]', 'main.c')).toBe(false);
         expect(check('Letter[!1]', 'Letter1')).toBe(false);
         expect(check('Letter[!1]', 'Letter2')).toBe(true);
-        expect(check('Letter[A-Za-z0-9]', 'Letter1')).toBe(true);
     });
 
     // Escaped characters
@@ -68,15 +67,21 @@ describe('Full test suite', () => {
         expect(check('\\*', '*')).toBe(true);
     });
 
-    // Weird edge cases
-    it('Should work with edge cases', () => {
+    // Multiple test cases between brackets
+    it('Should work multiple test cases between brackets', () => {
+        expect(check('Letter[A-Za-z0-9]', 'Letter1')).toBe(true);
+        expect(check('Letter[A-Za-z0-9]', 'Letter1a')).toBe(false);
+
         expect(check('Letter[A-Z1]', 'LetterA')).toBe(true);
         expect(check('Letter[A-Z1]', 'LetterB')).toBe(true);
         expect(check('Letter[A-Z1]', 'LetterZ')).toBe(true);
         expect(check('Letter[A-Z1]', 'Letter1')).toBe(true);
         expect(check('Letter[A-Z1]', 'Letter2')).toBe(false);
         expect(check('Letter[A-Z1]', 'Lettera')).toBe(false);
+    });
 
+    // Non-aplhanumeric chars between brackets
+    it('Should work with non-alphanumeric characters between brackets', () => {
         expect(check('[!]a-]', 'b')).toBe(true);
         expect(check('[!]a-]', ']')).toBe(false);
         expect(check('[!]a-]', 'a')).toBe(false);
@@ -88,12 +93,11 @@ describe('Full test suite', () => {
         expect(check('[--0]', '0')).toBe(true);
         expect(check('[--0]', 'b')).toBe(false);
 
-        // TODO: Fix these cases
-        // expect(check('[][!]', ']')).toBe(true);
-        // expect(check('[][!]', '[')).toBe(true);
-        // expect(check('[][!]', '!')).toBe(true);
-        // expect(check('[][!]', 'a')).toBe(false);
-        // expect(() => check('[][!', ']')).toThrow();
+        expect(check('[][!]', ']')).toBe(true);
+        expect(check('[][!]', '[')).toBe(true);
+        expect(check('[][!]', '!')).toBe(true);
+        expect(check('[][!]', 'a')).toBe(false);
+        expect(() => check('[][!', ']')).toThrow();
 
         expect(check('[[?*\\]', '[')).toBe(true);
         expect(check('[[?*\\]', '?')).toBe(true);
