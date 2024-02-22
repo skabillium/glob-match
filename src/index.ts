@@ -3,13 +3,10 @@ type MatchOptions = {
     strStart: number;
 };
 
-function UnclosedBracketException() {
-    return new Error('Unclosed bracket');
-}
-
-function UnfinishedEscapeException() {
-    return new Error('Unfinished escape');
-}
+const ErrorMessage = {
+    UnclosedBracket: 'Unclosed bracket',
+    UnfinishedEscape: 'Unfinished escape',
+};
 
 function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
     let p = opts?.patternStart ?? 0;
@@ -42,7 +39,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                     negate = true;
                     p++;
                     if (p === pattern.length) {
-                        throw UnclosedBracketException();
+                        throw new Error(ErrorMessage.UnclosedBracket);
                     }
                     chars += pattern[p];
                     p++;
@@ -101,7 +98,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                 }
 
                 if (pattern[p] !== ']') {
-                    throw UnclosedBracketException();
+                    throw new Error(ErrorMessage.UnclosedBracket);
                 }
 
                 // Result is a logical xor between the char includes and the negation
@@ -119,7 +116,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
             case '\\':
                 p++;
                 if (p === pattern.length) {
-                    throw UnfinishedEscapeException();
+                    throw new Error(ErrorMessage.UnfinishedEscape);
                 }
             default:
                 if (pattern[p] === str[s]) {
