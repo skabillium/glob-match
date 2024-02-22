@@ -20,6 +20,10 @@ describe('Full test suite', () => {
         expect(check('*Law*', 'Lawyer')).toBe(true);
         expect(check('*Law*', 'La')).toBe(false);
         expect(check('*Law*', 'aw')).toBe(false);
+
+        expect(check('*.js', 'example.js')).toBe(true);
+        expect(check('*.js', 'o.js')).toBe(true);
+        expect(check('*.js', 'example.ts')).toBe(false);
     });
 
     // Brackets
@@ -29,12 +33,17 @@ describe('Full test suite', () => {
         expect(check('*.[abc]', 'main.c')).toBe(true);
         expect(check('*.[abc]', 'main.d')).toBe(false);
         expect(() => check('*.[abc', 'main.a')).toThrow();
+
         expect(check('[CB]at', 'Cat')).toBe(true);
         expect(check('[CB]at', 'Bat')).toBe(true);
         expect(check('[CB]at', 'cat')).toBe(false);
         expect(check('[CB]at', 'bat')).toBe(false);
         expect(check('[CB]at', 'CBat')).toBe(false);
         expect(check('[CB]at', 'bat')).toBe(false);
+
+        expect(check('example.[jt]s', 'example.js')).toBe(true);
+        expect(check('example.[jt]s', 'example.ts')).toBe(true);
+        expect(check('example.[jt]s', 'example.csv')).toBe(false);
     });
 
     // Brackets with ranges
