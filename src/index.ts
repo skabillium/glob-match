@@ -31,8 +31,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                 break;
             case '[':
                 let negate = false;
-                let matched = false;
-                let chars = '';
+                let chars = ''; // List of characters in bracket
                 p++;
 
                 if (pattern[p] === '!') {
@@ -45,7 +44,6 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                     p++;
                 }
 
-                matched = (pattern[p] === str[s]) !== negate;
                 if (pattern[p] === ']' && p !== pattern.length - 1) {
                     chars += pattern[p];
                     p++;
@@ -102,6 +100,7 @@ function glob(pattern: string, str: string, opts?: MatchOptions): boolean {
                 }
 
                 // Result is a logical xor between the char includes and the negation
+                let matched = false;
                 if (chars !== '') {
                     matched = chars.includes(str[s]) !== negate;
                 }
@@ -167,6 +166,10 @@ export function check(
     }
 }
 
+/**
+ * Returns a checker function for a pattern
+ * @param pattern The pattern to check against
+ */
 export function Checker(pattern: string) {
     return (str: string) => glob(pattern, str);
 }
