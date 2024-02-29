@@ -151,4 +151,12 @@ describe('Full test suite', () => {
         expect(() => check(invalid, str, { onError: 'throw' })).toThrow();
         expect(check(invalid, str, { onError: 'false' })).toBe(false);
     });
+
+    it('Checker function should parse options', () => {
+        const isMatchError = Checker('main.[abc');
+        expect(() => isMatchError('main.a')).toThrow();
+
+        const isMatchFalse = Checker('main.[abc', { onError: 'false' });
+        expect(isMatchFalse('main.a')).toBe(false);
+    });
 });

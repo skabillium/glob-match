@@ -170,6 +170,6 @@ export function check(
  * Returns a checker function for a pattern
  * @param pattern The pattern to check against
  */
-export function Checker(pattern: string) {
-    return (str: string) => glob(pattern, str);
+export function Checker(pattern: string, checkOptions?: CheckOptions) {
+    return (str: string) => check(pattern, str, checkOptions);
 }
